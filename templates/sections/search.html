@@ -1,0 +1,129 @@
+{% extends 'sections/base_section.html' %}
+
+{% block page_title %}Búsqueda: {{ query }} — Comunidad Científica Chile{% endblock %}
+
+{% block section_content %}
+<section class="section">
+  <!-- Search Header -->
+  <div class="search-header">
+    <p class="eyebrow">Búsqueda global</p>
+    <h2>
+      {% if query %}
+        Resultados para <span class="gradient-text">{{ query }}</span>
+      {% else %}
+        ¿Qué estás buscando?
+      {% endif %}
+    </h2>
+
+    <form method="get" class="search-form" role="search" aria-label="Búsqueda global" style="margin-top:var(--space-md);">
+      <input
+        type="search"
+        name="q"
+        value="{{ query }}"
+        class="search-input"
+        placeholder="Buscar empleos, artículos, eventos, miembros…"
+        autofocus
+        aria-label="Término de búsqueda"
+      >
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+  </div>
+
+  {% if query %}
+    {% if total == 0 %}
+      <!-- No results -->
+      <div class="search-no-results glass">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.35;" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <h3>Sin resultados</h3>
+        <p>No encontramos nada para "{{ query }}". Intenta con términos diferentes.</p>
+        <a href="{% url 'global_search' %}" class="btn btn-ghost" style="margin-top:16px;">Limpiar búsqueda</a>
+      </div>
+
+    {% else %}
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:var(--space-xl);">
+        {{ total }} resultado{{ total|pluralize }} encontrado{{ total|pluralize }} para "{{ query }}"
+      </p>
+
+      <!-- Jobs -->
+      {% if results.jobs %}
+        <div class="search-group reveal">
+          <h3>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:5px;" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+            Empleos ({{ results.jobs|length }})
+          </h3>
+          <div class="search-results-grid">
+            {% for job in results.jobs %}
+              <a href="{% url 'empleo_postular' job.id %}" class="search-result-card glass">
+                <span class="job-badge">{{ job.get_job_type_display }}</span>
+                <h4>{{ job.title }}</h4>
+                <p>{{ job.institution }} · {{ job.location }}</p>
+                <small style="color:var(--text-muted);">{{ job.created_at|date:"d/m/Y" }}</small>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Blog Posts -->
+      {% if results.posts %}
+        <div class="search-group reveal">
+          <h3>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:5px;" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Artículos del blog ({{ results.posts|length }})
+          </h3>
+          <div class="search-results-grid">
+            {% for post in results.posts %}
+              <a href="{% url 'blog_detail' post.slug %}" class="search-result-card glass">
+                <h4>{{ post.title }}</h4>
+                <p>{{ post.excerpt|default:post.content|truncatewords:20 }}</p>
+                <small style="color:var(--text-muted);">Por {{ post.author.username }} · {{ post.created_at|date:"d/m/Y" }}</small>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Events -->
+      {% if results.events %}
+        <div class="search-group reveal">
+          <h3>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:5px;" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Eventos ({{ results.events|length }})
+          </h3>
+          <div class="search-results-grid">
+            {% for event in results.events %}
+              <a href="{% url 'eventos' %}" class="search-result-card glass">
+                <h4>{{ event.title }}</h4>
+                <p>{{ event.description|truncatewords:20 }}</p>
+                <small style="color:var(--text-muted);">{{ event.event_date|date:"d/m/Y" }}</small>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Members -->
+      {% if results.members %}
+        <div class="search-group reveal">
+          <h3>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:5px;" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Miembros ({{ results.members|length }})
+          </h3>
+          <div class="search-results-grid">
+            {% for member in results.members %}
+              <div class="search-result-card glass" style="cursor:default;">
+                <h4>{{ member.get_full_name|default:member.username }}</h4>
+                <p>{{ member.get_user_type_display }}{% if member.institution %} · {{ member.institution }}{% endif %}</p>
+                {% if member.bio %}
+                  <small style="color:var(--text-muted);">{{ member.bio|truncatewords:15 }}</small>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+    {% endif %}
+  {% endif %}
+</section>
+{% endblock %}

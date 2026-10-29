@@ -1,0 +1,26 @@
+.project-card.is-selected {
+  border-color: #8f63ff;
+  box-shadow: 0 0 0 2px rgb(143 99 255 / 18%);
+}
+
+.card-eyebrow {
+  color: #9673ec;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.card-meta {
+  color: #a9b4c8;
+  font-size: .875rem;
+}
+
+.action-button {
+  border: 1px solid #8965e8;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: .55rem .9rem;
+}

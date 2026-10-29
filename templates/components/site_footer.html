@@ -1,0 +1,82 @@
+<footer class="footer glass">
+  <div class="footer-top">
+    <!-- Brand -->
+    <div class="footer-brand">
+      <div class="footer-brand-row">
+        <div class="footer-logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="2.5"/>
+            <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(0 12 12)"/>
+            <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/>
+            <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>
+          </svg>
+        </div>
+        <div class="footer-brand-name">
+          Comunidad Científica Chile
+          <small>Red Nacional de Ciencia e Innovación</small>
+        </div>
+      </div>
+      <p class="footer-tagline">Portal profesional para investigadores, académicos e instituciones de Chile. Conectamos ciencia, empleabilidad y divulgación.</p>
+      <div class="social-links">
+        <a href="https://facebook.com" target="_blank" rel="noopener" class="social-btn" aria-label="Facebook">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="https://instagram.com" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener" class="social-btn" aria-label="LinkedIn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a href="https://twitter.com" target="_blank" rel="noopener" class="social-btn" aria-label="X / Twitter">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Módulos -->
+    <div class="footer-col">
+      <h5>Plataforma</h5>
+      <ul>
+        <li><a href="{% url 'comunidad' %}">Comunidad</a></li>
+        <li><a href="{% url 'empleos' %}">Empleos</a></li>
+        <li><a href="{% url 'biblioteca' %}">Biblioteca</a></li>
+        <li><a href="{% url 'eventos' %}">Eventos</a></li>
+        <li><a href="{% url 'turismo' %}">Turismo Científico</a></li>
+        <li><a href="{% url 'blog' %}">Blog</a></li>
+        <li><a href="{% url 'publicidad' %}">Publicidad</a></li>
+        <li><a href="{% url 'ia_page' %}">Asistente IA</a></li>
+      </ul>
+    </div>
+
+    <!-- Cuenta -->
+    <div class="footer-col">
+      <h5>Mi cuenta</h5>
+      <ul>
+        <li><a href="{% url 'register' %}">Registrarse</a></li>
+        <li><a href="{% url 'login' %}">Iniciar sesión</a></li>
+        <li><a href="{% url 'mi_panel' %}">Mi panel</a></li>
+        <li><a href="#">Recuperar contraseña</a></li>
+      </ul>
+    </div>
+
+    <!-- Contacto -->
+    <div class="footer-col">
+      <h5>Contacto</h5>
+      <ul>
+        <li><a href="mailto:info@comunidadcientifica.cl">info@comunidadcientifica.cl</a></li>
+        <li><a href="https://wa.me/56912345678" target="_blank" rel="noopener">+56 9 1234 5678</a></li>
+        <li><a href="#">Santiago, Chile</a></li>
+        <li><a href="#">Soporte técnico</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2026 Comunidad Científica Chile. Todos los derechos reservados.</p>
+    <div class="footer-legal">
+      <a href="#">Términos de uso</a>
+      <a href="#">Política de privacidad</a>
+      <a href="#">Accesibilidad</a>
+    </div>
+  </div>
+</footer>

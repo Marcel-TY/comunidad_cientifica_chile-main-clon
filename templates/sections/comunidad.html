@@ -1,0 +1,66 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="section">
+  <div class="section-head">
+    <h2>Miembros de la comunidad</h2>
+    <a href="{% url 'register' %}" class="btn btn-primary btn-mini">Unirse</a>
+  </div>
+
+  <!-- Búsqueda -->
+  <form method="get" class="module-search-bar" role="search" aria-label="Buscar miembros">
+    <input type="search" name="q" value="{{ search_query|default:'' }}" class="module-search-input" placeholder="Buscar por nombre, usuario o institución…">
+    <button type="submit" class="btn btn-primary btn-mini">Buscar</button>
+  </form>
+
+  {% if search_query %}
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:var(--space-md);">
+      {% if members_page.paginator.count %}
+        {{ members_page.paginator.count }} miembro{{ members_page.paginator.count|pluralize }} encontrado{{ members_page.paginator.count|pluralize }}.
+      {% else %}
+        Sin resultados para "{{ search_query }}". <a href="{% url 'comunidad' %}" style="color:var(--primary);">Ver todos</a>
+      {% endif %}
+    </p>
+  {% endif %}
+
+  <div class="community-members">
+    {% for member in members_page %}
+      <article class="member-card glass reveal">
+        <div class="member-badge {% if member.verification_badge %}verified{% else %}mentor{% endif %}">
+          {% if member.verification_badge %}✓{% else %}●{% endif %}
+        </div>
+        <h4>{{ member.get_full_name|default:member.username }}</h4>
+        <p class="member-field">{{ member.get_user_type_display }}{% if member.institution %} · {{ member.institution }}{% endif %}</p>
+        <p class="member-info">Miembro aprobado</p>
+      </article>
+    {% empty %}
+      <p class="empty-state">No hay miembros aprobados para mostrar.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Paginación -->
+  {% if members_page.has_other_pages %}
+    <nav class="modules-pagination" aria-label="Paginación de miembros">
+      {% if members_page.has_previous %}
+        <a class="page-btn" href="?q={{ search_query|urlencode }}&page={{ members_page.previous_page_number }}" aria-label="Página anterior">&lsaquo;</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">&lsaquo;</span>
+      {% endif %}
+
+      {% for num in members_page.paginator.page_range %}
+        {% if members_page.number == num %}
+          <span class="page-btn active" aria-current="page">{{ num }}</span>
+        {% elif num > members_page.number|add:"-3" and num < members_page.number|add:"3" %}
+          <a class="page-btn" href="?q={{ search_query|urlencode }}&page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if members_page.has_next %}
+        <a class="page-btn" href="?q={{ search_query|urlencode }}&page={{ members_page.next_page_number }}" aria-label="Página siguiente">&rsaquo;</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">&rsaquo;</span>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

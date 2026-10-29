@@ -1,0 +1,60 @@
+<section class="research-shell">
+  <header class="research-heading">
+    <p class="heading-eyebrow">Centro de estudios · Chile</p>
+    <h1>Investigación científica</h1>
+    <p>Proyectos, equipo investigador y publicaciones en un catálogo conectado al sistema Django.</p>
+  </header>
+
+  <section aria-labelledby="projects-title">
+    <div class="section-title">
+      <h2 id="projects-title">Proyectos de investigación</h2>
+      <span>{{ projects.length }} registros</span>
+    </div>
+    <div class="card-grid">
+      @for (project of projects; track project.id) {
+        <app-project-card [project]="project"
+                          [selected]="selectedProjectId === project.id"
+                          (projectSelected)="selectProject($event)" />
+      } @empty {
+        <p class="empty-state">Aún no hay proyectos registrados.</p>
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="researchers-title">
+    <div class="section-title">
+      <h2 id="researchers-title">Investigadores e investigadoras</h2>
+      @if (selectedProjectId !== null) {
+        <button type="button" class="text-button" (click)="selectedProjectId = null">
+          Mostrar todos
+        </button>
+      }
+    </div>
+    <div class="card-grid">
+      @for (researcher of visibleResearchers; track researcher.id) {
+        <app-researcher-card [researcher]="researcher" />
+      } @empty {
+        <p class="empty-state">No hay integrantes asociados al proyecto seleccionado.</p>
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="publications-title">
+    <div class="section-title">
+      <h2 id="publications-title">Publicaciones científicas</h2>
+      <span>{{ publications.length }} registros</span>
+    </div>
+    <div class="card-grid">
+      @for (publication of publications; track publication.id) {
+        <app-publication-card [publication]="publication"
+                              [highlighted]="highlightedPublicationId === publication.id"
+                              (publicationHighlighted)="highlightPublication($event)" />
+      } @empty {
+        <p class="empty-state">Aún no hay publicaciones registradas.</p>
+      }
+    </div>
+  </section>
+
+  <p class="data-note">Los registros de demostración están identificados como ejemplos. Deben sustituirse
+    por información revisada y autorizada por el centro.</p>
+</section>

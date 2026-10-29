@@ -1,0 +1,27 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="section">
+  <div class="section-head">
+    <h2>Tablón de comunidad</h2>
+    <a href="{% url 'biblioteca_publicar' %}" class="btn btn-primary btn-mini">Publicar aviso</a>
+  </div>
+
+  <div class="bulletin-items">
+    {% for post in bulletin_posts %}
+      <article class="bulletin-item glass">
+        <h4>{{ post.get_category_display }}</h4>
+        <p><strong>{{ post.title }}</strong></p>
+        <p>{{ post.description|truncatewords:30 }}</p>
+        <p class="bulletin-meta">
+          {% if post.author %}Publicado por {{ post.author.username }} · {% endif %}
+          {{ post.created_at|date:"d/m/Y H:i" }}
+        </p>
+        <a href="mailto:{{ post.contact_email }}" class="btn btn-mini btn-ghost">Contactar</a>
+      </article>
+    {% empty %}
+      <p class="empty-state">No hay avisos publicados actualmente.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

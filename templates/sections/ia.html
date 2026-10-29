@@ -1,0 +1,113 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="ai-section glass">
+  <div class="ai-header">
+    <h2>Asistente CCC — IA 24/7</h2>
+    <div class="ai-status">
+      <svg class="ai-live-dot" width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+        <circle cx="6" cy="6" r="6" fill="#00c989"/>
+      </svg>
+      <span>En línea</span>
+    </div>
+  </div>
+
+  <p class="ai-subtitle">Consultas sobre fondos, empleabilidad y estrategia científica.</p>
+
+  <div class="ai-quick-section">
+    <button class="ai-quick-btn" type="button" onclick="setAIQuery('¿Cómo postulo a Fondecyt?')">¿Cómo postulo a Fondecyt?</button>
+    <button class="ai-quick-btn" type="button" onclick="setAIQuery('Necesito mejorar mi CV científico')">Mejorar CV científico</button>
+    <button class="ai-quick-btn" type="button" onclick="setAIQuery('Eventos de networking en Chile')">Networking en Chile</button>
+    <button class="ai-quick-btn" type="button" onclick="setAIQuery('Ruta de IA para investigación')">Ruta IA investigación</button>
+  </div>
+
+  <div class="ai-chat-box" id="aiChatBox">
+    <div class="ai-welcome">
+      <p><strong>Asistente listo</strong></p>
+      <p>Escribe tu objetivo y te responderá con pasos concretos.</p>
+    </div>
+  </div>
+
+  <form class="ai-form" onsubmit="submitAIQuery(event)">
+    <input type="text" id="aiInput" class="ai-input" placeholder="Escribe tu consulta" autocomplete="off">
+    <button type="submit" class="btn btn-primary btn-mini">Preguntar</button>
+  </form>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function appendMsg(role, text, actions = []) {
+    const chatBox = document.getElementById('aiChatBox');
+    const msg = document.createElement('div');
+    msg.className = `ai-msg ${role === 'ai' ? 'ai-msg-bot' : 'ai-msg-user'}`;
+    msg.innerHTML = `<p>${text}</p>`;
+
+    if (actions.length && role === 'ai') {
+      const actionDiv = document.createElement('div');
+      actionDiv.className = 'ai-actions';
+      actions.forEach(action => {
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-mini btn-ghost';
+        btn.type = 'button';
+        btn.textContent = action;
+        btn.onclick = () => setAIQuery(action);
+        actionDiv.appendChild(btn);
+      });
+      msg.appendChild(actionDiv);
+    }
+
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  function setAIQuery(query) {
+    document.getElementById('aiInput').value = query;
+  }
+
+  async function submitAIQuery(event) {
+    event.preventDefault();
+    const input = document.getElementById('aiInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMsg('user', message);
+    input.value = '';
+
+    try {
+      const response = await fetch('{% url "ai_chat" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+      if (data.ok) {
+        appendMsg('ai', data.reply, data.actions || []);
+      } else {
+        appendMsg('ai', data.error || 'No fue posible responder.');
+      }
+    } catch (_) {
+      appendMsg('ai', 'Error de conexión.');
+    }
+  }
+</script>
+{% endblock %}

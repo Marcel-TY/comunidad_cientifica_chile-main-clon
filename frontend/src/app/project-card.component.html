@@ -1,0 +1,12 @@
+<article class="research-card project-card" [class.is-selected]="selected">
+  <p class="card-eyebrow">{{ project.researchArea }} · {{ project.status }}</p>
+  <h3>{{ project.title }}</h3>
+  <p>{{ project.summary }}</p>
+  @if (project.funder) {
+    <p class="card-meta">Financiamiento: {{ project.funder }}</p>
+  }
+  <button type="button" class="action-button" (click)="selectProject()"
+          [attr.aria-pressed]="selected">
+    {{ selected ? 'Quitar filtro' : 'Ver equipo investigador' }}
+  </button>
+</article>

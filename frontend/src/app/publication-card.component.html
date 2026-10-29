@@ -1,0 +1,16 @@
+<article class="research-card publication-card" [class.is-highlighted]="highlighted">
+  <p class="card-eyebrow">{{ publication.journal }} · {{ publication.publicationDate }}</p>
+  <h3>{{ publication.title }}</h3>
+  <p>{{ publication.abstract }}</p>
+  @if (publication.projectTitle) {
+    <p class="card-meta">Proyecto: {{ publication.projectTitle }}</p>
+  }
+  <p class="card-meta">Autores: {{ publication.researcherNames.join(', ') }}</p>
+  @if (publication.doi) {
+    <a [href]="publication.doi" target="_blank" rel="noopener noreferrer">Ver publicación</a>
+  }
+  <button type="button" class="action-button" (click)="toggleHighlight()"
+          [attr.aria-pressed]="highlighted">
+    {{ highlighted ? 'Quitar destacado' : 'Destacar publicación' }}
+  </button>
+</article>

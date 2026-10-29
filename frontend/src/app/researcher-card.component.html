@@ -1,0 +1,8 @@
+<article class="research-card researcher-card">
+  <p class="card-eyebrow">{{ researcher.expertise }}</p>
+  <h3>{{ researcher.fullName }}</h3>
+  <p class="card-meta">{{ researcher.institution }}</p>
+  @if (researcher.biography) {
+    <p>{{ researcher.biography }}</p>
+  }
+</article>

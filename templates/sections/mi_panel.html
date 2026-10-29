@@ -1,0 +1,256 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="section">
+  <div class="panel-metrics-grid">
+    <article class="panel-metric glass">
+      <h3>{{ user_metrics.applications_count }}</h3>
+      <p>Postulaciones enviadas</p>
+    </article>
+    <article class="panel-metric glass">
+      <h3>{{ user_metrics.posts_count }}</h3>
+      <p>Avisos publicados</p>
+    </article>
+    <article class="panel-metric glass">
+      <h3>{{ user_metrics.tourism_count }}</h3>
+      <p>Solicitudes de turismo</p>
+    </article>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Postulaciones recientes</h2>
+    <div class="panel-head-tools">
+      <form method="get" class="inline-filter-form">
+        <input type="hidden" name="post_category" value="{{ selected_post_category }}">
+        <input type="hidden" name="post_q" value="{{ post_search }}">
+        <input type="hidden" name="tourism_status" value="{{ selected_tourism_status }}">
+        <input type="hidden" name="tourism_q" value="{{ tourism_search }}">
+        <input type="text" name="app_q" value="{{ app_search }}" class="panel-search-input" placeholder="Buscar oferta o institución">
+        <select name="app_status" class="panel-filter-select" onchange="this.form.submit()">
+          <option value="all" {% if selected_app_status == 'all' %}selected{% endif %}>Todas</option>
+          {% for value, label in app_status_choices %}
+            <option value="{{ value }}" {% if selected_app_status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-ghost btn-mini">Aplicar</button>
+      </form>
+      <a href="{% url 'mi_panel_export_applications' %}?status={{ selected_app_status }}&q={{ app_search|urlencode }}" class="btn btn-ghost btn-mini">Exportar CSV</a>
+      <a href="{% url 'empleos' %}" class="btn btn-ghost btn-mini">Buscar empleos</a>
+    </div>
+  </div>
+
+  <div class="panel-table-wrap glass">
+    <table class="panel-table">
+      <thead>
+        <tr>
+          <th>Oferta</th>
+          <th>Institución</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in applications_page %}
+          <tr>
+            <td>{{ item.job_offer.title }}</td>
+            <td>{{ item.job_offer.institution }}</td>
+            <td>{{ item.get_status_display }}</td>
+            <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">Sin postulaciones registradas.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if applications_page.paginator.num_pages > 1 %}
+    <div class="panel-pagination">
+      {% if applications_page.has_previous %}
+        <a class="btn btn-ghost btn-mini" href="?{{ app_query_base }}&app_page={{ applications_page.previous_page_number }}">Anterior</a>
+      {% endif %}
+      <span>Página {{ applications_page.number }} de {{ applications_page.paginator.num_pages }}</span>
+      {% if applications_page.has_next %}
+        <a class="btn btn-ghost btn-mini" href="?{{ app_query_base }}&app_page={{ applications_page.next_page_number }}">Siguiente</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Avisos publicados</h2>
+    <div class="panel-head-tools">
+      <form method="get" class="inline-filter-form">
+        <input type="hidden" name="app_status" value="{{ selected_app_status }}">
+        <input type="hidden" name="app_q" value="{{ app_search }}">
+        <input type="hidden" name="tourism_status" value="{{ selected_tourism_status }}">
+        <input type="hidden" name="tourism_q" value="{{ tourism_search }}">
+        <input type="text" name="post_q" value="{{ post_search }}" class="panel-search-input" placeholder="Buscar título o descripción">
+        <select name="post_category" class="panel-filter-select" onchange="this.form.submit()">
+          <option value="all" {% if selected_post_category == 'all' %}selected{% endif %}>Todas</option>
+          {% for value, label in post_category_choices %}
+            <option value="{{ value }}" {% if selected_post_category == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-ghost btn-mini">Aplicar</button>
+      </form>
+      <a href="{% url 'mi_panel_export_posts' %}?category={{ selected_post_category }}&q={{ post_search|urlencode }}" class="btn btn-ghost btn-mini">Exportar CSV</a>
+      <a href="{% url 'biblioteca_publicar' %}" class="btn btn-ghost btn-mini">Nuevo aviso</a>
+    </div>
+  </div>
+
+  <div class="panel-table-wrap glass">
+    <table class="panel-table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Categoría</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in posts_page %}
+          <tr>
+            <td>{{ item.title }}</td>
+            <td>{{ item.get_category_display }}</td>
+            <td>{% if item.is_active %}Activo{% else %}Inactivo{% endif %}</td>
+            <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">Sin avisos registrados.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if posts_page.paginator.num_pages > 1 %}
+    <div class="panel-pagination">
+      {% if posts_page.has_previous %}
+        <a class="btn btn-ghost btn-mini" href="?{{ post_query_base }}&post_page={{ posts_page.previous_page_number }}">Anterior</a>
+      {% endif %}
+      <span>Página {{ posts_page.number }} de {{ posts_page.paginator.num_pages }}</span>
+      {% if posts_page.has_next %}
+        <a class="btn btn-ghost btn-mini" href="?{{ post_query_base }}&post_page={{ posts_page.next_page_number }}">Siguiente</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Solicitudes de turismo</h2>
+    <div class="panel-head-tools">
+      <form method="get" class="inline-filter-form">
+        <input type="hidden" name="app_status" value="{{ selected_app_status }}">
+        <input type="hidden" name="app_q" value="{{ app_search }}">
+        <input type="hidden" name="post_category" value="{{ selected_post_category }}">
+        <input type="hidden" name="post_q" value="{{ post_search }}">
+        <input type="text" name="tourism_q" value="{{ tourism_search }}" class="panel-search-input" placeholder="Buscar destino o institución">
+        <select name="tourism_status" class="panel-filter-select" onchange="this.form.submit()">
+          <option value="all" {% if selected_tourism_status == 'all' %}selected{% endif %}>Todas</option>
+          {% for value, label in tourism_status_choices %}
+            <option value="{{ value }}" {% if selected_tourism_status == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-ghost btn-mini">Aplicar</button>
+      </form>
+      <a href="{% url 'mi_panel_export_tourism' %}?status={{ selected_tourism_status }}&q={{ tourism_search|urlencode }}" class="btn btn-ghost btn-mini">Exportar CSV</a>
+      <a href="{% url 'turismo_solicitar' %}" class="btn btn-ghost btn-mini">Nueva solicitud</a>
+    </div>
+  </div>
+
+  <div class="panel-table-wrap glass">
+    <table class="panel-table">
+      <thead>
+        <tr>
+          <th>Destino</th>
+          <th>Participantes</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in tourism_page %}
+          <tr>
+            <td>{{ item.destination }}</td>
+            <td>{{ item.participants }}</td>
+            <td>{{ item.get_status_display }}</td>
+            <td>{{ item.created_at|date:"d/m/Y H:i" }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">Sin solicitudes registradas.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if tourism_page.paginator.num_pages > 1 %}
+    <div class="panel-pagination">
+      {% if tourism_page.has_previous %}
+        <a class="btn btn-ghost btn-mini" href="?{{ tourism_query_base }}&tourism_page={{ tourism_page.previous_page_number }}">Anterior</a>
+      {% endif %}
+      <span>Página {{ tourism_page.number }} de {{ tourism_page.paginator.num_pages }}</span>
+      {% if tourism_page.has_next %}
+        <a class="btn btn-ghost btn-mini" href="?{{ tourism_query_base }}&tourism_page={{ tourism_page.next_page_number }}">Siguiente</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+
+<!-- Rec #9 — Favoritos ────────────────────────────────────── -->
+{% if user.is_authenticated %}
+<section class="section">
+  <div class="section-head">
+    <h2>Empleos guardados</h2>
+    <a href="{% url 'empleos' %}" class="btn btn-ghost btn-mini">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Explorar empleos
+    </a>
+  </div>
+
+  {% if favorite_jobs %}
+    <div class="jobs-grid">
+      {% for job in favorite_jobs %}
+        <article class="job-card glass">
+          <div class="job-header">
+            <h3>{{ job.title }}</h3>
+            <span class="job-badge">{{ job.get_job_type_display }}</span>
+          </div>
+          <p class="job-institution">{{ job.institution }}</p>
+          <p class="job-location">{{ job.location }}</p>
+          <p class="job-desc">{{ job.description|truncatewords:20 }}</p>
+          <div class="job-footer">
+            <small>{{ job.created_at|date:"d/m/Y" }}</small>
+            <div style="display:flex; gap:8px;">
+              <button class="fav-btn is-fav"
+                      data-item-type="job" data-item-id="{{ job.id }}"
+                      aria-label="Quitar de favoritos">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span class="fav-label">Guardado</span>
+              </button>
+              <a href="{% url 'empleo_postular' job.id %}" class="btn btn-primary btn-mini">Postular</a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align:center; padding:var(--space-xl) var(--space-lg); color:var(--text-muted);">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px; opacity:.4;" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <p style="font-weight:600; margin-bottom:6px; color:var(--text);">Aún no tienes empleos guardados</p>
+      <p style="font-size:13px;">Usa el botón ★ Guardar en las ofertas laborales para acceder rápidamente desde aquí.</p>
+    </div>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

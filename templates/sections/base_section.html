@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+
+{% include 'components/site_nav.html' %}
+
+<main class="container">
+  <header class="compact-hero glass">
+    <p class="eyebrow">{{ section_eyebrow|default:'Portal módular' }}</p>
+    <h1>{{ section_title|default:'Comunidad Científica Chile' }}</h1>
+    <p>{{ section_description|default:'Navega por módulos especializados para una operación más eficiente.' }}</p>
+  </header>
+
+  <a class="btn btn-ghost module-home-btn" href="{% url 'index' %}">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+    Volver al inicio
+  </a>
+
+  {% if messages %}
+    <div class="section" style="margin-bottom: 24px;">
+      {% for message in messages %}
+        <div class="alert {{ message.tags|default:'info' }}" role="alert">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block section_content %}{% endblock %}
+</main>
+
+{% include 'components/floating_widgets.html' %}
+{% include 'components/site_footer.html' %}
+
+<div id="actionModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal-card glass" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h3 id="modalTitle">Acción del módulo</h3>
+      <button type="button" class="btn btn-ghost btn-mini" onclick="closeActionModal()">✕ Cerrar</button>
+    </div>
+    <p id="modalMessage">Estamos preparando este flujo.</p>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+  function openActionModal(message) {
+    const modal = document.getElementById('actionModal');
+    document.getElementById('modalMessage').textContent = message || 'Estamos preparando este flujo.';
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+  function closeActionModal() {
+    const modal = document.getElementById('actionModal');
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+  document.addEventListener('click', function (e) {
+    const trigger = e.target.closest('.js-open-modal');
+    if (trigger) openActionModal(trigger.getAttribute('data-modal-message'));
+    const overlay = e.target.closest('.modal-overlay');
+    if (overlay && e.target === overlay) closeActionModal();
+  });
+</script>
+{% block extra_scripts %}{% endblock %}
+{% endblock %}

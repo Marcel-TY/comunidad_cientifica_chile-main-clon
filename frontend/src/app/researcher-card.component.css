@@ -1,0 +1,14 @@
+.researcher-card {
+  min-height: 10rem;
+}
+
+.card-eyebrow {
+  color: #9673ec;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.card-meta {
+  color: #a9b4c8;
+}

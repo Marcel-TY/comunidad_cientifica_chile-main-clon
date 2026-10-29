@@ -1,0 +1,17 @@
+venv/
+__pycache__/
+*.pyc
+db.sqlite3
+*.sqlite3
+.DS_Store
+.env
+*.log
+staticfiles/
+static/angular/
+.env.*
+.idea/
+.vscode/
+node_modules/
+
+.venv/
+!.env.example

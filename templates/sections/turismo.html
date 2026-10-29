@@ -1,0 +1,57 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="section">
+  <div class="section-head">
+    <h2>Turismo científico premium</h2>
+    <a href="{% url 'turismo_solicitar' %}" class="btn btn-primary btn-mini">Solicitar itinerario</a>
+  </div>
+
+  <div class="tourism-grid">
+    <article class="tourism-card glass">
+      <div class="tourism-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 21l6-6"></path>
+          <path d="M14 4l6 6"></path>
+          <path d="M8 16l8-8"></path>
+          <path d="M4 14l6 6"></path>
+        </svg>
+      </div>
+      <h4>Observatorio ALMA</h4>
+      <p class="tourism-location">San Pedro de Atacama</p>
+      <p class="tourism-rating">5.0 / 5</p>
+      <p>Recorrido técnico con foco astronómico y networking internacional.</p>
+    </article>
+
+    <article class="tourism-card glass">
+      <div class="tourism-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="8" cy="13" r="2"></circle>
+          <circle cx="12" cy="11" r="2"></circle>
+          <circle cx="16" cy="13" r="2"></circle>
+          <circle cx="10" cy="16" r="2"></circle>
+          <circle cx="14" cy="16" r="2"></circle>
+          <path d="M12 7c0-2 1-3 3-4"></path>
+        </svg>
+      </div>
+      <h4>Valle del Maipo Científico</h4>
+      <p class="tourism-location">Santiago rural</p>
+      <p class="tourism-rating">4.5 / 5</p>
+      <p>Ruta enológica, sostenibilidad y ciencia aplicada al territorio.</p>
+    </article>
+
+    <article class="tourism-card glass">
+      <div class="tourism-icon" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 15c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"></path>
+          <path d="M3 19c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"></path>
+        </svg>
+      </div>
+      <h4>Valparaíso Patrimonial</h4>
+      <p class="tourism-location">Región de Valparaíso</p>
+      <p class="tourism-rating">4.4 / 5</p>
+      <p>Cultura, patrimonio y experiencias académicas interdisciplinarias.</p>
+    </article>
+  </div>
+</section>
+{% endblock %}

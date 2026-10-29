@@ -1,0 +1,71 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="section">
+  <div class="section-head">
+    <h2>Publicaciones del blog</h2>
+    {% if user.is_superuser or user.user_type == 'admin' %}
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-ghost btn-mini">Gestionar contenido</a>
+    {% else %}
+      <a href="{% url 'register' %}" class="btn btn-ghost btn-mini">Crear cuenta de autor</a>
+    {% endif %}
+  </div>
+
+  <!-- Búsqueda -->
+  <form method="get" class="module-search-bar" role="search" aria-label="Buscar publicaciones">
+    <input type="search" name="q" value="{{ search_query|default:'' }}" class="module-search-input" placeholder="Buscar por título, etiquetas o contenido…">
+    <button type="submit" class="btn btn-primary btn-mini">Buscar</button>
+  </form>
+
+  {% if search_query %}
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:var(--space-md);">
+      {% if posts_page.paginator.count %}
+        {{ posts_page.paginator.count }} publicación{{ posts_page.paginator.count|pluralize:"es" }} encontrada{{ posts_page.paginator.count|pluralize }}.
+      {% else %}
+        Sin resultados para "{{ search_query }}". <a href="{% url 'blog' %}" style="color:var(--primary);">Ver todas</a>
+      {% endif %}
+    </p>
+  {% endif %}
+
+  <div class="blog-grid">
+    {% for post in posts_page %}
+      <article class="blog-card glass reveal">
+        {% if post.featured_image %}
+          <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="blog-image" loading="lazy">
+        {% endif %}
+        <h3>{{ post.title }}</h3>
+        <p class="blog-excerpt">{{ post.excerpt|default:post.content|truncatewords:30 }}</p>
+        <p class="blog-meta">Por {{ post.author.username }} · {{ post.created_at|date:"d/m/Y" }}</p>
+        <a href="{% url 'blog_detail' post.slug %}" class="btn btn-mini btn-primary">Leer artículo</a>
+      </article>
+    {% empty %}
+      <p class="empty-state">No hay publicaciones disponibles.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Paginación -->
+  {% if posts_page.has_other_pages %}
+    <nav class="modules-pagination" aria-label="Paginación del blog">
+      {% if posts_page.has_previous %}
+        <a class="page-btn" href="?q={{ search_query|urlencode }}&page={{ posts_page.previous_page_number }}" aria-label="Página anterior">&lsaquo;</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">&lsaquo;</span>
+      {% endif %}
+
+      {% for num in posts_page.paginator.page_range %}
+        {% if posts_page.number == num %}
+          <span class="page-btn active" aria-current="page">{{ num }}</span>
+        {% elif num > posts_page.number|add:"-3" and num < posts_page.number|add:"3" %}
+          <a class="page-btn" href="?q={{ search_query|urlencode }}&page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if posts_page.has_next %}
+        <a class="page-btn" href="?q={{ search_query|urlencode }}&page={{ posts_page.next_page_number }}" aria-label="Página siguiente">&rsaquo;</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">&rsaquo;</span>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

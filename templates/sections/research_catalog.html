@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_title %}Investigación científica | Comunidad Científica Chile{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'angular/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+  {% include "components/site_nav.html" %}
+  <main class="research-page">
+    <app-root></app-root>
+  </main>
+  {% include "components/site_footer.html" %}
+  {{ research_data|json_script:"research-data" }}
+  <script type="module" src="{% static 'angular/polyfills.js' %}"></script>
+  <script type="module" src="{% static 'angular/main.js' %}"></script>
+{% endblock %}

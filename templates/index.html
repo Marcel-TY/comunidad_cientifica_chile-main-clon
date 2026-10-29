@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block page_title %}Comunidad Científica Chile — Portal de Ciencia e Innovación{% endblock %}
+{% block content %}
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+
+{% include 'components/site_nav.html' %}
+
+<main class="container">
+
+  <!-- ══ HERO ══════════════════════════════════════════════ -->
+  <section class="home-hero glass" aria-label="Bienvenida">
+    <div class="home-hero-content">
+      <span class="eyebrow">🇨🇱 Portal oficial · Red Nacional de Ciencia</span>
+      <h1>Todo lo que necesitas para <span class="gradient-text">investigar, publicar y conectar</span></h1>
+      <p class="home-hero-text">Una plataforma diseñada para cualquier persona: botones claros, módulos separados y ayuda con inteligencia artificial disponible 24/7.</p>
+
+      <div class="hero-ctas">
+        <a href="{% url 'register' %}" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+          Crear cuenta gratis
+        </a>
+        <a href="{% url 'ia_page' %}" class="btn btn-ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Ayuda con IA
+        </a>
+      </div>
+
+      <div class="home-kpis">
+        <article>
+          <strong>{{ stats.members|default:"0" }}</strong>
+          <span>Miembros</span>
+        </article>
+        <article>
+          <strong>{{ stats.jobs|default:"0" }}</strong>
+          <span>Empleos</span>
+        </article>
+        <article>
+          <strong>{{ stats.events|default:"0" }}</strong>
+          <span>Eventos</span>
+        </article>
+        <article>
+          <strong>{{ stats.posts|default:"0" }}</strong>
+          <span>Publicaciones</span>
+        </article>
+      </div>
+    </div>
+
+    <div class="home-hero-media">
+      <img src="{% static 'images/hero_science.svg' %}" alt="Plataforma científica con módulos de empleos, blog, IA y más" loading="eager" width="480" height="440">
+    </div>
+  </section>
+
+  <!-- ══ TRUST STRIP ════════════════════════════════════════ -->
+  <div class="trust-strip glass">
+    <span class="trust-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      <strong>100% gratuito</strong> para investigadores
+    </span>
+    <span class="trust-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      <strong>PWA instalable</strong> en cualquier dispositivo
+    </span>
+    <span class="trust-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      <strong>IA integrada</strong> para soporte inmediato
+    </span>
+    <span class="trust-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+      <strong>Datos seguros</strong> y privacidad garantizada
+    </span>
+  </div>
+
+  <!-- ══ HOW IT WORKS ═══════════════════════════════════════ -->
+  <section class="section" aria-labelledby="how-title">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Guía rápida</p>
+        <h2 id="how-title">¿Cómo usar la plataforma?</h2>
+      </div>
+      <span class="muted-chip">Para cualquier nivel de experiencia</span>
+    </div>
+    <div class="how-grid">
+      <article class="how-card glass">
+        <div class="how-card-num" aria-hidden="true">1</div>
+        <div class="how-card-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        </div>
+        <h3>Regístrate</h3>
+        <p>Crea tu cuenta en menos de 2 minutos. Solo nombre, email y contraseña.</p>
+      </article>
+      <article class="how-card glass">
+        <div class="how-card-num" aria-hidden="true">2</div>
+        <div class="how-card-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <h3>Elige un módulo</h3>
+        <p>Empleos, comunidad, blog, eventos, turismo o publicidad. Cada uno es independiente.</p>
+      </article>
+      <article class="how-card glass">
+        <div class="how-card-num" aria-hidden="true">3</div>
+        <div class="how-card-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h3>Interactúa</h3>
+        <p>Postula empleos, publica avisos, solicita itinerarios o consulta al Asistente IA.</p>
+      </article>
+      <article class="how-card glass">
+        <div class="how-card-num" aria-hidden="true">4</div>
+        <div class="how-card-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        </div>
+        <h3>Haz seguimiento</h3>
+        <p>Revisa tus postulaciones, avisos y solicitudes en <a href="{% url 'mi_panel' %}">Mi panel</a> con filtros y exportación CSV.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ══ MODULES GRID ═══════════════════════════════════════ -->
+  <section class="section" aria-labelledby="modules-title">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Acceso rápido</p>
+        <h2 id="modules-title">Módulos de la plataforma</h2>
+      </div>
+      <a href="{% url 'comunidad' %}" class="btn btn-ghost btn-mini">Ver comunidad</a>
+    </div>
+
+    <div class="module-pro-grid">
+
+      <article class="module-pro-card glass">
+        <div class="module-pro-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h3>Comunidad</h3>
+        <p>Encuentra perfiles, colaboradores y alianzas de investigación.</p>
+        <a href="{% url 'comunidad' %}" class="btn btn-primary btn-mini">Abrir</a>
+      </article>
+
+      <article class="module-pro-card glass">
+        <div class="module-pro-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        </div>
+        <h3>Empleos</h3>
+        <p>Postula a vacantes de academia, industria e investigación.</p>
+        <a href="{% url 'empleos' %}" class="btn btn-primary btn-mini">Abrir</a>
+      </article>
+
+      <article class="module-pro-card glass">
+        <div class="module-pro-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </div>
+        <h3>Biblioteca</h3>
+        <p>Publica y revisa avisos comunitarios por categoría.</p>
+        <a href="{% url 'biblioteca' %}" class="btn btn-primary btn-mini">Abrir</a>
+      </article>
+
+      <article class="module-pro-card glass">
+        <div class="module-pro-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h3>Eventos</h3>
+        <p>Agenda de congresos, charlas, talleres y networking científico.</p>
+        <a href="{% url 'eventos' %}" class="btn btn-primary btn-mini">Abrir</a>
+      </article>
+
+      <article class="module-pro-card glass">
+        <div class="module-pro-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <h3>Turismo Científico</h3>
+        <p>Solicita experiencias guiadas en destinos científicos de Chile.</p>
+        <a href="{% url 'turismo' %}" class="btn btn-primary btn-mini">Abrir</a>
+      </article>
+
+      <article class="module-pro-card glass">
+        <div class="module-pro-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
+        </div>
+        <h3>Blog</h3>
+        <p>Contenido de innovación, investigación y divulgación científica.</p>
+        <a href="{% url 'blog' %}" class="btn btn-primary btn-mini">Abrir</a>
+      </article>
+
+      <article class="module-pro-card glass">
+        <div class="module-pro-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        </div>
+        <h3>Publicidad</h3>
+        <p>Crea campañas con imagen o video. Llega a toda la red científica.</p>
+        <a href="{% url 'publicidad' %}" class="btn btn-primary btn-mini">Abrir</a>
+      </article>
+
+      <article class="module-pro-card glass">
+        <div class="module-pro-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" opacity=".4"/></svg>
+        </div>
+        <h3>Asistente IA</h3>
+        <p>Soporte inmediato para consultas sobre fondos, empleos y eventos.</p>
+        <a href="{% url 'ia_page' %}" class="btn btn-primary btn-mini">Abrir</a>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ══ ADS SECTION ════════════════════════════════════════ -->
+  {% if advertisements %}
+  <section class="section" aria-labelledby="ads-title">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Patrocinadores</p>
+        <h2 id="ads-title">Publicidad destacada</h2>
+      </div>
+      <a href="{% url 'publicidad' %}" class="btn btn-ghost btn-mini">Gestionar campañas</a>
+    </div>
+    <div class="home-ads-grid">
+      {% for ad in advertisements %}
+        <article class="home-ad-card glass">
+          {% if ad.video %}
+            <video controls preload="metadata" class="home-ad-media" aria-label="{{ ad.title }}">
+              <source src="{{ ad.video.url }}">
+            </video>
+          {% elif ad.image %}
+            <img src="{{ ad.image.url }}" alt="{{ ad.title }}" class="home-ad-media" loading="lazy">
+          {% else %}
+            <div class="home-ad-placeholder" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(157,131,253,.5)" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+          {% endif %}
+          <div class="home-ad-body">
+            <h3>{{ ad.title }}</h3>
+            <p>{{ ad.description|truncatewords:18 }}</p>
+            {% if ad.link_url %}<a href="{{ ad.link_url }}" target="_blank" rel="noopener" class="btn btn-primary btn-mini">Ver campaña</a>{% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ══ TESTIMONIALES ════════════════════════════════════ -->
+  {% if testimonials %}
+  <section class="section reveal" aria-labelledby="testimonials-title">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Comunidad activa</p>
+        <h2 id="testimonials-title">Lo que dice nuestra comunidad</h2>
+      </div>
+    </div>
+    <div class="testimonials-grid">
+      {% for t in testimonials %}
+        <article class="testimonial-card glass reveal reveal-delay-{{ forloop.counter }}">
+          <span class="testimonial-quote" aria-hidden="true">"</span>
+          <p class="testimonial-text">"«{{ t.text }}»"</p>
+          <div class="testimonial-stars" aria-label="{{ t.rating }} de 5 estrellas">
+            {% for i in "12345" %}{% if forloop.counter <= t.rating %}★{% else %}☆{% endif %}{% endfor %}
+          </div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" aria-hidden="true">{{ t.author.first_name|slice:":1"|upper|default:t.author.username|slice:":1"|upper }}</div>
+            <div>
+              <p class="testimonial-name">{{ t.author.get_full_name|default:t.author.username }}</p>
+              <p class="testimonial-role">{{ t.author.get_user_type_display }}{% if t.author.institution %} · {{ t.author.institution }}{% endif %}</p>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ══ FAQ ════════════════════════════════════════════════ -->
+  <section class="section" aria-labelledby="faq-title">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Ayuda rápida</p>
+        <h2 id="faq-title">Preguntas frecuentes</h2>
+      </div>
+      <a href="{% url 'ia_page' %}" class="btn btn-ghost btn-mini">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Consultar a IA
+      </a>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item glass">
+        <summary>¿Necesito experiencia técnica para usar la plataforma?</summary>
+        <div class="faq-item-body"><p>No. Está diseñada para cualquier nivel de experiencia: botones claramente etiquetados, módulos independientes y una guía paso a paso disponible en todo momento. El Asistente IA puede responder tus preguntas en segundos.</p></div>
+      </details>
+      <details class="faq-item glass">
+        <summary>¿Cómo publico una oferta laboral o un aviso?</summary>
+        <div class="faq-item-body"><p>Regístrate, ve al módulo correspondiente (Empleos o Biblioteca) y completa el formulario. El equipo administrador revisará y aprobará tu publicación. Puedes ver el estado en "Mi panel".</p></div>
+      </details>
+      <details class="faq-item glass">
+        <summary>¿La app se puede instalar en mi celular o computador?</summary>
+        <div class="faq-item-body"><p>Sí. Es una PWA (Progressive Web App). En tu navegador aparecerá el botón "Instalar App" que te permitirá usarla sin conexión y desde tu pantalla de inicio, igual que una app nativa.</p></div>
+      </details>
+      <details class="faq-item glass">
+        <summary>¿Qué tipo de empleos puedo encontrar aquí?</summary>
+        <div class="faq-item-body"><p>Ofertas académicas (postdoctorados, docencias), puestos en industria tecnológica, roles de I+D, consultorías y más. Todas están vinculadas a la comunidad científica chilena.</p></div>
+      </details>
+      <details class="faq-item glass">
+        <summary>¿Qué es el Turismo Científico?</summary>
+        <div class="faq-item-body"><p>Son itinerarios guiados a sitios de interés científico de Chile: observatorios astronómicos, ecosistemas únicos, centros de investigación y más. Puedes solicitar un itinerario personalizado para tu grupo.</p></div>
+      </details>
+      <details class="faq-item glass">
+        <summary>¿Cómo funciona el Asistente IA?</summary>
+        <div class="faq-item-body"><p>Es un chatbot especializado en la comunidad científica chilena. Puede orientarte sobre fondos de investigación, empleos disponibles, eventos próximos e información de la plataforma. Disponible sin costo las 24 horas.</p></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ══ CTA FINAL ══════════════════════════════════════════ -->
+  <section class="section">
+    <div class="home-hero glass" style="grid-template-columns:1fr; text-align:center; padding: 48px 32px;">
+      <div>
+        <span class="eyebrow">Únete hoy</span>
+        <h2 style="font-size:clamp(26px,3.5vw,42px); font-weight:900; margin-bottom:14px;">Sé parte de la red científica más grande de Chile</h2>
+        <p style="color:var(--text-soft); max-width:560px; margin:0 auto 28px; font-size:16px; line-height:1.65;">Regístrate gratis, accede a todos los módulos y conecta con miles de investigadores, académicos e instituciones.</p>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+          <a href="{% url 'register' %}" class="btn btn-primary">Crear cuenta gratuita</a>
+          <a href="{% url 'empleos' %}"  class="btn btn-ghost">Ver ofertas laborales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% include 'components/floating_widgets.html' %}
+{% include 'components/site_footer.html' %}
+{% endblock %}

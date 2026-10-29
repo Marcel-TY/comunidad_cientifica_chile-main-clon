@@ -1,0 +1,29 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="section">
+  <div class="section-head">
+    <h2>Agenda de eventos</h2>
+    <a href="{% url 'publicidad' %}" class="btn btn-ghost btn-mini">Promocionar evento</a>
+  </div>
+
+  <div class="events-grid">
+    {% for event in upcoming_events %}
+      <article class="event-card glass">
+        <p class="event-date">{{ event.start_date|date:"d/m/Y" }} · {{ event.start_date|time:"H:i" }}</p>
+        <h4>{{ event.title }}</h4>
+        <p class="event-org">{{ event.organized_by }}</p>
+        <p class="event-location">{{ event.location }}</p>
+        <p>{{ event.description|truncatewords:26 }}</p>
+        {% if event.registration_url %}
+          <a href="{{ event.registration_url }}" target="_blank" rel="noopener" class="btn btn-primary btn-mini">Registrarse</a>
+        {% else %}
+          <button type="button" class="btn btn-ghost btn-mini js-open-modal" data-modal-message="Este evento aún no abre inscripciones. Te notificaremos cuando el organizador active el registro.">Próximamente</button>
+        {% endif %}
+      </article>
+    {% empty %}
+      <p class="empty-state">No hay eventos próximos en agenda.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

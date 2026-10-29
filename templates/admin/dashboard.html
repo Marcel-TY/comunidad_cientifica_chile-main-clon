@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+  <!-- Chart.js (Rec #16) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+  <div class="admin-header">
+    <h1>Panel de Administración</h1>
+    <p>Gestiona usuarios, empleos, blog, eventos, turismo y publicidad desde un solo lugar</p>
+  </div>
+
+  <div class="admin-section" style="margin-bottom:16px;">
+    <h2>Gestión global de plataforma</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;">
+      <a href="/admin/" class="btn btn-ghost">Abrir Django Admin</a>
+      <a href="{% url 'admin_dashboard' %}" class="btn btn-ghost">Refrescar panel</a>
+      <a href="{% url 'mi_panel' %}" class="btn btn-ghost">Ver Mi panel</a>
+      <a href="{% url 'global_search' %}" class="btn btn-ghost">Buscar en plataforma</a>
+      <a href="{% url 'empleos' %}" class="btn btn-ghost">Módulo Empleos</a>
+      <a href="{% url 'blog' %}" class="btn btn-ghost">Módulo Blog</a>
+      <a href="{% url 'eventos' %}" class="btn btn-ghost">Módulo Eventos</a>
+      <a href="{% url 'publicidad' %}" class="btn btn-ghost">Módulo Publicidad</a>
+    </div>
+  </div>
+
+  <!-- Stats Cards (Rec #16 — SVG icons) -->
+  <div class="admin-stats">
+    <div class="stat-card glass">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ total_users }}</h3>
+        <p>Usuarios registrados</p>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ total_jobs }}</h3>
+        <p>Empleos activos</p>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ total_ads }}</h3>
+        <p>Publicidades activas</p>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ pending_users.count }}</h3>
+        <p>Usuarios pendientes</p>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ total_posts }}</h3>
+        <p>Posts publicados</p>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ total_events }}</h3>
+        <p>Eventos registrados</p>
+      </div>
+    </div>
+    <div class="stat-card glass">
+      <div class="stat-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div class="stat-content">
+        <h3>{{ total_tourism }}</h3>
+        <p>Solicitudes turismo</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js Bar Chart (Rec #16) -->
+  <div class="admin-chart-wrap glass">
+    <h3>Resumen de actividad</h3>
+    <div class="admin-chart-canvas">
+      <canvas id="adminActivityChart" aria-label="Gráfico de actividad de la plataforma" role="img"></canvas>
+    </div>
+  </div>
+
+  <div class="admin-sections">
+    <!-- Usuarios Pendientes -->
+    <div class="admin-section">
+      <h2>Usuarios Pendientes de Aprobación ({{ pending_users.count }})</h2>
+      {% if pending_users %}
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Email</th>
+              <th>Tipo</th>
+              <th>Institución</th>
+              <th>Registrado</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in pending_users %}
+              <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td><span class="badge">{{ user.get_user_type_display }}</span></td>
+                <td>{{ user.institution|default:"—" }}</td>
+                <td>{{ user.created_at|date:"d/m/Y" }}</td>
+                <td>
+                  <a href="{% url 'approve_user' user.id %}" class="btn btn-mini btn-success">Aprobar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="empty-message">No hay usuarios pendientes 🎉</p>
+      {% endif %}
+    </div>
+
+    <!-- Ofertas Pendientes -->
+    <div class="admin-section">
+      <h2>Ofertas de Trabajo Pendientes ({{ pending_jobs.count }})</h2>
+      {% if pending_jobs %}
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Institución</th>
+              <th>Publicado por</th>
+              <th>Fecha</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for job in pending_jobs %}
+              <tr>
+                <td>{{ job.title }}</td>
+                <td>{{ job.institution }}</td>
+                <td>{{ job.published_by.username }}</td>
+                <td>{{ job.created_at|date:"d/m/Y" }}</td>
+                <td>
+                  <a href="{% url 'approve_job' job.id %}" class="btn btn-mini btn-success">Activar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="empty-message">No hay ofertas pendientes</p>
+      {% endif %}
+    </div>
+
+    <div class="admin-section">
+      <h2>Publicidades Pendientes de Activación ({{ pending_ads.count }})</h2>
+      {% if pending_ads %}
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Posición</th>
+              <th>Clics</th>
+              <th>Vistas</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ad in pending_ads %}
+              <tr>
+                <td>{{ ad.title }}</td>
+                <td>{{ ad.get_position_display }}</td>
+                <td>{{ ad.clicks }}</td>
+                <td>{{ ad.views }}</td>
+                <td><a href="{% url 'approve_ad' ad.id %}" class="btn btn-mini btn-success">Activar</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="empty-message">No hay publicidades pendientes</p>
+      {% endif %}
+    </div>
+
+    <div class="admin-section">
+      <h2>Actividad reciente de la plataforma</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;">
+        <div>
+          <h3 style="font-size:14px; margin:0 0 8px; color:var(--text-muted);">Últimos usuarios</h3>
+          <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;">
+            {% for item in latest_users %}
+              <li style="font-size:13px;">{{ item.username }} <span style="color:var(--text-muted);">· {{ item.created_at|date:"d/m H:i" }}</span></li>
+            {% empty %}
+              <li class="empty-message" style="text-align:left; padding:0;">Sin datos</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:14px; margin:0 0 8px; color:var(--text-muted);">Últimos empleos</h3>
+          <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;">
+            {% for item in latest_jobs %}
+              <li style="font-size:13px;">{{ item.title|truncatechars:42 }} <span style="color:var(--text-muted);">· {{ item.created_at|date:"d/m H:i" }}</span></li>
+            {% empty %}
+              <li class="empty-message" style="text-align:left; padding:0;">Sin datos</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:14px; margin:0 0 8px; color:var(--text-muted);">Últimos posts</h3>
+          <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;">
+            {% for item in latest_posts %}
+              <li style="font-size:13px;">{{ item.title|truncatechars:42 }} <span style="color:var(--text-muted);">· {{ item.created_at|date:"d/m H:i" }}</span></li>
+            {% empty %}
+              <li class="empty-message" style="text-align:left; padding:0;">Sin datos</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <h3 style="font-size:14px; margin:0 0 8px; color:var(--text-muted);">Últimos eventos</h3>
+          <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;">
+            {% for item in latest_events %}
+              <li style="font-size:13px;">{{ item.title|truncatechars:42 }} <span style="color:var(--text-muted);">· {{ item.created_at|date:"d/m H:i" }}</span></li>
+            {% empty %}
+              <li class="empty-message" style="text-align:left; padding:0;">Sin datos</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ctx = document.getElementById('adminActivityChart');
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Usuarios', 'Empleos activos', 'Publicidades', 'Pendientes'],
+      datasets: [{
+        label: 'Total',
+        data: [{{ total_users }}, {{ total_jobs }}, {{ total_ads }}, {{ pending_users.count }}],
+        backgroundColor: [
+          'rgba(124,92,252,.7)',
+          'rgba(0,201,255,.7)',
+          'rgba(0,184,122,.7)',
+          'rgba(255,193,7,.7)'
+        ],
+        borderColor: [
+          'rgba(124,92,252,1)',
+          'rgba(0,201,255,1)',
+          'rgba(0,184,122,1)',
+          'rgba(255,193,7,1)'
+        ],
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: { label: function(ctx) { return ' ' + ctx.parsed.y + ' registros'; } }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: 'rgba(243,245,255,.7)', font: { size: 12 } },
+          grid: { color: 'rgba(255,255,255,.05)' }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: 'rgba(243,245,255,.7)', stepSize: 1 },
+          grid: { color: 'rgba(255,255,255,.07)' }
+        }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

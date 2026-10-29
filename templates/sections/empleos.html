@@ -1,0 +1,88 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="section">
+  <div class="section-head">
+    <h2>Ofertas laborales activas</h2>
+    <a href="{% url 'register' %}" class="btn btn-ghost btn-mini">Solicitar acceso de publicación</a>
+  </div>
+
+  <!-- Búsqueda y filtros -->
+  <form method="get" class="module-search-bar" role="search" aria-label="Buscar empleos">
+    <input type="search" name="q" value="{{ search_query|default:'' }}" class="module-search-input" placeholder="Buscar por título, institución o descripción…">
+    <select name="tipo" class="module-search-input" style="flex:0 0 auto; max-width:180px;" onchange="this.form.submit()" aria-label="Tipo de empleo">
+      <option value="">Todos los tipos</option>
+      {% for value, label in job_type_choices %}
+        <option value="{{ value }}" {% if selected_tipo == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary btn-mini">Buscar</button>
+  </form>
+
+  {% if search_query or selected_tipo %}
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:var(--space-md);">
+      {% if jobs_page.paginator.count %}
+        {{ jobs_page.paginator.count }} resultado{{ jobs_page.paginator.count|pluralize }} encontrado{{ jobs_page.paginator.count|pluralize }}
+      {% else %}
+        Sin resultados para tu búsqueda.
+      {% endif %}
+      &mdash; <a href="{% url 'empleos' %}" style="color:var(--primary);">Limpiar filtros</a>
+    </p>
+  {% endif %}
+
+  <div class="jobs-grid">
+    {% for job in jobs_page %}
+      <article class="job-card glass reveal">
+        <div class="job-header">
+          <h3>{{ job.title }}</h3>
+          <span class="job-badge">{{ job.get_job_type_display }}</span>
+        </div>
+        <p class="job-institution">{{ job.institution }}</p>
+        <p class="job-location">{{ job.location }}</p>
+        <p class="job-desc">{{ job.description|truncatewords:28 }}</p>
+        <div class="job-footer">
+          <small>Publicado {{ job.created_at|timesince }} atrás</small>
+          <div style="display:flex; gap:8px; align-items:center;">
+            {% if user.is_authenticated %}
+              <button class="fav-btn {% if job.id in favorite_job_ids %}is-fav{% endif %}"
+                      data-item-type="job" data-item-id="{{ job.id }}"
+                      aria-label="{% if job.id in favorite_job_ids %}Quitar de favoritos{% else %}Guardar oferta{% endif %}">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="{% if job.id in favorite_job_ids %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span class="fav-label">{% if job.id in favorite_job_ids %}Guardado{% else %}Guardar{% endif %}</span>
+              </button>
+            {% endif %}
+            <a href="{% url 'empleo_postular' job.id %}" class="btn btn-primary btn-mini">Postular</a>
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <p class="empty-state">No hay ofertas activas{% if search_query %} para "{{ search_query }}"{% endif %}.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Paginación -->
+  {% if jobs_page.has_other_pages %}
+    <nav class="modules-pagination" aria-label="Paginación de empleos">
+      {% if jobs_page.has_previous %}
+        <a class="page-btn" href="?q={{ search_query|urlencode }}&tipo={{ selected_tipo }}&page={{ jobs_page.previous_page_number }}" aria-label="Página anterior">&lsaquo;</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">&lsaquo;</span>
+      {% endif %}
+
+      {% for num in jobs_page.paginator.page_range %}
+        {% if jobs_page.number == num %}
+          <span class="page-btn active" aria-current="page">{{ num }}</span>
+        {% elif num > jobs_page.number|add:"-3" and num < jobs_page.number|add:"3" %}
+          <a class="page-btn" href="?q={{ search_query|urlencode }}&tipo={{ selected_tipo }}&page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if jobs_page.has_next %}
+        <a class="page-btn" href="?q={{ search_query|urlencode }}&tipo={{ selected_tipo }}&page={{ jobs_page.next_page_number }}" aria-label="Página siguiente">&rsaquo;</a>
+      {% else %}
+        <span class="page-btn disabled" aria-disabled="true">&rsaquo;</span>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
+{% endblock %}

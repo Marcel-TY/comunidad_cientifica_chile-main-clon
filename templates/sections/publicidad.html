@@ -1,0 +1,76 @@
+{% extends 'sections/base_section.html' %}
+
+{% block section_content %}
+<section class="section">
+  <div class="section-head">
+    <h2>Carrusel de publicidades</h2>
+    <a href="{% url 'register' %}" class="btn btn-primary btn-mini">Publicar anuncio</a>
+  </div>
+
+  <div class="ads-carousel glass" id="adsCarousel">
+    <button type="button" class="carousel-control prev" aria-label="Anterior" onclick="moveCarousel(-1)">‹</button>
+
+    <div class="carousel-track" id="carouselTrack">
+      {% for ad in advertisements %}
+        <article class="ad-slide">
+          {% if ad.video %}
+            <video controls preload="metadata" class="ad-image">
+              <source src="{{ ad.video.url }}">
+            </video>
+          {% elif ad.image %}
+            <img src="{{ ad.image.url }}" alt="{{ ad.title }}" class="ad-image">
+          {% else %}
+            <div class="ad-image ad-placeholder">Sin recurso multimedia</div>
+          {% endif %}
+          <div class="ad-content">
+            <h3>{{ ad.title }}</h3>
+            <p>{{ ad.description|truncatewords:20 }}</p>
+            <a href="{{ ad.link_url }}" target="_blank" rel="noopener" class="btn btn-primary btn-mini">Ver anuncio</a>
+          </div>
+        </article>
+      {% empty %}
+        <article class="ad-slide ad-empty">
+          <h3>Sin campañas activas</h3>
+          <p>Cuando se aprueben anuncios aparecerán aquí automáticamente.</p>
+        </article>
+      {% endfor %}
+    </div>
+
+    <button type="button" class="carousel-control next" aria-label="Siguiente" onclick="moveCarousel(1)">›</button>
+  </div>
+
+  <div class="ads-info-grid">
+    <article class="glass ads-info-card">
+      <h4>Modelo comercial</h4>
+      <p>Pago por anuncio activo, sin membresías obligatorias.</p>
+    </article>
+    <article class="glass ads-info-card">
+      <h4>Métricas</h4>
+      <p>Visualizaciones y clics por campaña para reporte profesional.</p>
+    </article>
+    <article class="glass ads-info-card">
+      <h4>Aprobación</h4>
+      <p>Control editorial desde panel admin para proteger calidad.</p>
+    </article>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  let currentAd = 0;
+
+  function moveCarousel(direction) {
+    const track = document.getElementById('carouselTrack');
+    if (!track) return;
+
+    const slides = track.querySelectorAll('.ad-slide');
+    if (!slides.length) return;
+
+    currentAd = (currentAd + direction + slides.length) % slides.length;
+    track.style.transform = `translateX(-${currentAd * 100}%)`;
+  }
+
+  setInterval(() => moveCarousel(1), 6000);
+</script>
+{% endblock %}

@@ -1,0 +1,24 @@
+.publication-card.is-highlighted {
+  border-color: #f1bd57;
+  box-shadow: 0 0 0 2px rgb(241 189 87 / 20%);
+}
+
+.card-eyebrow {
+  color: #9673ec;
+  font-size: .75rem;
+  font-weight: 700;
+}
+
+.card-meta {
+  color: #a9b4c8;
+  font-size: .875rem;
+}
+
+.action-button {
+  border: 1px solid #8965e8;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: .55rem .9rem;
+}
