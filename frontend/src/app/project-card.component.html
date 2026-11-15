@@ -1,5 +1,5 @@
 <article class="research-card project-card" [class.is-selected]="selected">
-  <p class="card-eyebrow">{{ project.researchArea }} · {{ project.status }}</p>
+  <p class="card-eyebrow">{{ project.researchArea }} · {{ project.statusLabel }}</p>
   <h3>{{ project.title }}</h3>
   <p>{{ project.summary }}</p>
   @if (project.funder) {

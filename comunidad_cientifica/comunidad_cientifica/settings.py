@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
@@ -22,14 +24,18 @@ PROJECT_ROOT = BASE_DIR.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-*@@3^&3xeqw-*irw=fu17ci^qs!w54(dpmxb5e4h07ia!4&2k9'
-)
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() == 'true'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('DJANGO_SECRET_KEY must be configured when DEBUG is disabled.')
+    SECRET_KEY = 'django-insecure-local-development-only'
 
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
-
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -43,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',    # Rec #10 & #19 — Sitemap.xml
     'corsheaders',                # Rec #14 — CORS headers
+    'rest_framework',
     'accounts',
     'research',
 ]
@@ -168,29 +175,29 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = False
 
 # ── Rec #22 — Email backend (console in dev, SMTP in production) ──────────────
-EMAIL_BACKEND       = os.environ.get(
+EMAIL_BACKEND = os.environ.get(
     'EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend'
 )
-EMAIL_HOST          = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT          = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_HOST_USER     = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-EMAIL_USE_TLS       = True
-DEFAULT_FROM_EMAIL  = os.environ.get(
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = os.environ.get(
     'DEFAULT_FROM_EMAIL', 'Comunidad Científica <noreply@comunidadcientifica.cl>'
 )
 
 # ── Login / Redirect ──────────────────────────────────────────────────────────
-LOGIN_URL          = '/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 
 # ── Rec #15 — Production security headers (only when DEBUG=False) ─────────────
 if not DEBUG:
-    SECURE_BROWSER_XSS_FILTER      = True
-    SECURE_CONTENT_TYPE_NOSNIFF    = True
-    X_FRAME_OPTIONS                = 'DENY'
-    SECURE_HSTS_SECONDS            = 31536000
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_SSL_REDIRECT            = True
-    SESSION_COOKIE_SECURE          = True
-    CSRF_COOKIE_SECURE             = True
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

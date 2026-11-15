@@ -66,6 +66,7 @@ urlpatterns = [
     path('empleos/<int:job_id>/postular/', empleo_postular, name='empleo_postular'),
     path('biblioteca/', biblioteca_page, name='biblioteca'),
     path('investigacion/', include('research.urls')),
+    path('api/research/', include('research.api_urls')),
     path('biblioteca/publicar/', biblioteca_publicar, name='biblioteca_publicar'),
     path('eventos/',   eventos_page,    name='eventos'),
     path('turismo/',   turismo_page,    name='turismo'),

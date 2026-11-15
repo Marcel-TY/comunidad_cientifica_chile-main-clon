@@ -19,7 +19,7 @@ La pauta de evaluación compartida fue usada como fuente para estas mejoras. No 
 - **Angular** (`frontend/`): aplicación standalone y componentes reutilizables con TypeScript, HTML y CSS separados.
 - **Django** (`comunidad_cientifica/`): configuración del sitio, rutas, vistas, aplicación `accounts` existente y nueva aplicación `research`.
 - **PostgreSQL**: base predeterminada del proyecto, configurable mediante variables de entorno.
-- **Integración del catálogo**: la ruta Django `/investigacion/` consulta los modelos mediante el ORM, prepara el contexto y lo serializa en la página con `json_script`. Angular consume ese contexto y presenta los datos. No se necesita una API REST para este flujo.
+- **Integración del catálogo**: Django sirve la aplicación Angular en `/investigacion/`. Angular consulta el catálogo mediante la API REST `/api/research/`, que lee PostgreSQL con el ORM de Django y responde JSON. La API ofrece operaciones de lectura públicas, pero limita las modificaciones a personal con sesión autenticada y permiso de administración.
 
 ### Modelos y relaciones
 
@@ -28,6 +28,20 @@ La pauta de evaluación compartida fue usada como fuente para estas mejoras. No 
 - `ScientificPublication`: publicación, revista, fecha, DOI/enlace, relación opcional con un proyecto y relación muchos-a-muchos con autores.
 
 Los tres modelos se pueden administrar desde el sitio `/admin/`.
+
+### API REST, JSON y XML
+
+| Endpoint | Métodos | Acceso |
+|---|---|---|
+| `/api/research/` | `GET` | Público; catálogo JSON consolidado |
+| `/api/research/session/` | `GET` | Informa si la sesión pertenece a personal administrador |
+| `/api/research/projects/`, `/researchers/`, `/publications/` | `GET`, `POST` | Lectura pública; creación solo para personal administrador |
+| `/api/research/projects/<id>/`, `/researchers/<id>/`, `/publications/<id>/` | `GET`, `PATCH`, `PUT`, `DELETE` | Lectura pública; cambios solo para personal administrador |
+| `/api/research/export.xml` | `GET` | Exporta el catálogo como XML |
+
+JSON es el formato de intercambio principal entre Angular y Django. Las operaciones de escritura usan la sesión de Django, protección CSRF y permisos de personal (`is_staff`); no requieren una API key en el navegador. El correo de investigadores se acepta al crear o editar, pero no se incluye en las respuestas públicas. Angular muestra errores de conexión/validación y vuelve a consultar el catálogo después de cada cambio exitoso.
+
+El catálogo y la API se sirven desde el mismo origen, por lo que Angular no necesita credenciales CORS separadas. Para administrar registros, inicia sesión con una cuenta Django con permiso de personal; se puede crear una cuenta local con `python manage.py createsuperuser`. Las rutas de escritura requieren esa sesión y un token CSRF válido. La API puede probarse con `GET http://127.0.0.1:8000/api/research/` para JSON y `GET http://127.0.0.1:8000/api/research/export.xml` para XML.
 
 ## Requisitos
 
@@ -78,6 +92,28 @@ Los tres modelos se pueden administrar desde el sitio `/admin/`.
 
 Para una comprobación local rápida sin PostgreSQL se puede establecer explícitamente `DB_ENGINE=django.db.backends.sqlite3`, pero esa configuración no cumple el requisito de la versión evaluada. El flujo de CI utiliza PostgreSQL.
 
+## Prueba desde otros dispositivos de la red local
+
+Para que el centro o el equipo pueda revisar el sitio desde otro dispositivo conectado a la misma red Wi-Fi, abre PowerShell en el equipo que ejecutará Django y configura la IP local del equipo en `DJANGO_ALLOWED_HOSTS`. La IP puede cambiar al reconectarse a la red; consulta el valor actual con `ipconfig` y busca la dirección IPv4 del adaptador Wi-Fi:
+
+```powershell
+$ip = "192.168.1.112" # Reemplazar por la dirección IPv4 actual del equipo
+$env:DJANGO_ALLOWED_HOSTS = "localhost,127.0.0.1,$ip"
+```
+
+En esa misma ventana, desde la raíz del proyecto, compila Angular y levanta Django escuchando conexiones de la red:
+
+```powershell
+npm ci --prefix frontend
+npm run build --prefix frontend
+Set-Location comunidad_cientifica
+python manage.py runserver 0.0.0.0:8000
+```
+
+Desde otro dispositivo en la misma red, abre `http://<IP-DEL-EQUIPO>:8000/investigacion/`; por ejemplo, `http://192.168.1.112:8000/investigacion/` si esa sigue siendo la IP actual. Si Windows solicita permiso de firewall, permite el acceso solo en redes privadas. Si no aparece la página, revisa que ambos dispositivos estén en la misma red y que el firewall permita conexiones entrantes al puerto 8000.
+
+Esta dirección es **solo para pruebas en la red local**: el equipo que ejecuta Django debe permanecer encendido y el servidor activo. `runserver` es un servidor de desarrollo; no lo expongas a Internet ni configures reenvío de puertos del router. Para una URL pública permanente hace falta desplegar la aplicación en un servicio de hosting.
+
 ## Pruebas y compilación
 
 Desde la raíz del repositorio:
@@ -90,7 +126,7 @@ python manage.py check
 python manage.py test accounts research
 ```
 
-El workflow de GitHub Actions instala las dependencias bloqueadas de Angular con Node.js 20.19 y construye el front-end. También instala Python 3.12/3.13, inicia PostgreSQL, aplica las migraciones (incluida la inicial de `research`) y ejecuta los tests del proyecto. Los archivos generados en `static/angular/` no se versionan: se reconstruyen para cada validación o despliegue.
+El workflow de GitHub Actions instala las dependencias bloqueadas de Angular con Node.js 20.19, construye el front-end y ejecuta sus pruebas unitarias en ChromeHeadless. También instala Python 3.12/3.13, ejecuta `flake8` en la app `research` y la configuración Django, inicia PostgreSQL, aplica las migraciones (incluida la inicial de `research`) y ejecuta los tests de `accounts` y `research` con cobertura. El lint se limita a esos módulos porque el código legado de `accounts` y las vistas generales ya contienen advertencias de estilo no relacionadas con este catálogo. Los archivos generados en `static/angular/` no se versionan: se reconstruyen para cada validación o despliegue.
 
 ## Producción
 
@@ -105,7 +141,7 @@ python manage.py collectstatic --noinput
 gunicorn comunidad_cientifica.wsgi:application
 ```
 
-La publicación pública y la URL de evaluación aún deben configurarse en un proveedor de hosting y vincularse al repositorio GitHub del equipo. Este directorio de trabajo no incluye un repositorio `.git`, credenciales de GitHub ni credenciales de hosting; por ello, esta modificación por sí sola no crea un commit ni una URL pública.
+`DJANGO_SECRET_KEY` es obligatorio cuando `DJANGO_DEBUG=False`; la aplicación falla explícitamente al arrancar si falta. Configura una clave secreta fuerte en el proveedor y nunca la guardes en el repositorio. La publicación pública y la URL de evaluación aún deben configurarse en un proveedor de hosting; subir cambios a GitHub no despliega automáticamente esta aplicación Django. Después del despliegue, registrar aquí la URL pública, la URL de la API y el commit correspondiente.
 
 ## Estructura principal
 

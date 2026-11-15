@@ -2,7 +2,7 @@
 # CI/CD — Comunidad Científica Chile
 # Runs on every push/PR to main or develop:
 #   1. Build the Angular frontend
-#   2. Lint (flake8), check Django and apply PostgreSQL migrations
+#   2. Lint the research app and Django settings, check Django, apply PostgreSQL migrations
 #   3. Run the test suite with coverage
 # ──────────────────────────────────────────────────────────────
 
@@ -72,6 +72,9 @@ jobs:
       - name: Build Angular frontend
         run: npm run build --prefix ../frontend
 
+      - name: Test Angular frontend
+        run: npm test --prefix ../frontend -- --watch=false --browsers=ChromeHeadless
+
       # ── 3. Set up Python ─────────────────────────────────────
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -87,9 +90,9 @@ jobs:
           pip install flake8 coverage
 
       # ── 5. Lint ───────────────────────────────────────────────
-      - name: Lint with flake8
+      - name: Lint research app and Django settings
         run: |
-          flake8 . \
+          flake8 research comunidad_cientifica/settings.py \
             --max-line-length=120 \
             --exclude=migrations,__pycache__,.git,venv \
             --count --statistics

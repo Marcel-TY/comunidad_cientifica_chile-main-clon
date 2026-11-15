@@ -49,6 +49,88 @@
   font-size: .9rem;
 }
 
+.catalog-actions,
+.form-actions,
+.management-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.catalog-actions {
+  margin-top: 1.25rem;
+}
+
+.managed-card {
+  min-width: 0;
+}
+
+.management-actions {
+  padding: .5rem .75rem;
+}
+
+.danger-button {
+  color: #ff9a9a;
+}
+
+.editor-form {
+  background: rgb(255 255 255 / 4%);
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 1rem;
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  max-width: 760px;
+  padding: 1.25rem;
+}
+
+.editor-form label {
+  display: grid;
+  gap: .4rem;
+}
+
+.editor-form input,
+.editor-form textarea,
+.editor-form select {
+  background: #101827;
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: .5rem;
+  color: #eef2fb;
+  font: inherit;
+  padding: .65rem .75rem;
+  width: 100%;
+}
+
+.editor-form select[multiple] {
+  min-height: 7rem;
+}
+
+.editor-form textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.editor-form small,
+.status-message {
+  color: #a9b4c8;
+}
+
+.status-message {
+  border-radius: .5rem;
+  padding: .75rem 1rem;
+}
+
+.error-message {
+  background: rgb(190 45 45 / 18%);
+  color: #ffc0c0;
+}
+
+.success-message {
+  background: rgb(35 140 90 / 18%);
+  color: #a5efc2;
+}
+
 .card-grid {
   display: grid;
   gap: 1rem;

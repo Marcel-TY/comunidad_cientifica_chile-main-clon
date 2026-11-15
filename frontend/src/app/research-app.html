@@ -2,23 +2,88 @@
   <header class="research-heading">
     <p class="heading-eyebrow">Centro de estudios · Chile</p>
     <h1>Investigación científica</h1>
-    <p>Proyectos, equipo investigador y publicaciones en un catálogo conectado al sistema Django.</p>
+    <p>Proyectos, equipo investigador y publicaciones consultados desde la API de Django.</p>
+    <nav class="catalog-actions" aria-label="Acciones del catálogo">
+      <a class="action-button" href="/api/research/export.xml">Descargar catálogo XML</a>
+      @if (!canManage) {
+        <a class="text-button" href="/admin/login/?next=/investigacion/">Ingresar como administrador</a>
+      }
+    </nav>
   </header>
+
+  @if (loading) {
+    <p class="status-message" role="status">Cargando información científica…</p>
+  }
+  @if (errorMessage) {
+    <p class="status-message error-message" role="alert">{{ errorMessage }}</p>
+  }
+  @if (successMessage) {
+    <p class="status-message success-message" role="status">{{ successMessage }}</p>
+  }
 
   <section aria-labelledby="projects-title">
     <div class="section-title">
       <h2 id="projects-title">Proyectos de investigación</h2>
       <span>{{ projects.length }} registros</span>
     </div>
+    @if (canManage) {
+      <button type="button" class="action-button" (click)="beginProjectCreate()">
+        Nuevo proyecto
+      </button>
+    }
     <div class="card-grid">
       @for (project of projects; track project.id) {
-        <app-project-card [project]="project"
-                          [selected]="selectedProjectId === project.id"
-                          (projectSelected)="selectProject($event)" />
+        <div class="managed-card">
+          <app-project-card
+            [project]="project"
+            [selected]="selectedProjectId === project.id"
+            (projectSelected)="selectProject($event)" />
+          @if (canManage) {
+            <div class="management-actions">
+              <button type="button" class="text-button" (click)="editProject(project)">Editar</button>
+              <button type="button" class="text-button danger-button" (click)="deleteProject(project)">
+                Eliminar
+              </button>
+            </div>
+          }
+        </div>
       } @empty {
         <p class="empty-state">Aún no hay proyectos registrados.</p>
       }
     </div>
+    @if (canManage && projectFormVisible) {
+      <form class="editor-form" #projectForm="ngForm" (ngSubmit)="saveProject()">
+        <h3>{{ editingProjectId === null ? 'Crear proyecto' : 'Editar proyecto' }}</h3>
+        <label>Nombre <input name="projectTitle" [(ngModel)]="projectDraft.title" required maxlength="240"></label>
+        <label>Resumen <input name="projectSummary" [(ngModel)]="projectDraft.summary" required maxlength="400"></label>
+        <label>Descripción <textarea name="projectDescription" [(ngModel)]="projectDraft.description" required></textarea></label>
+        <label>Área de investigación <input name="projectArea" [(ngModel)]="projectDraft.researchArea" required maxlength="160"></label>
+        <label>Financiamiento <input name="projectFunder" [(ngModel)]="projectDraft.funder" maxlength="200"></label>
+        <label>Estado
+          <select name="projectStatus" [(ngModel)]="projectDraft.status" required>
+            <option value="proposed">Propuesto</option>
+            <option value="active">En curso</option>
+            <option value="completed">Finalizado</option>
+          </select>
+        </label>
+        <label>Equipo investigador
+          <select multiple (change)="updateProjectResearchers($event)">
+            @for (researcher of researchers; track researcher.id) {
+              <option [value]="researcher.id"
+                      [selected]="projectDraft.researcherIds.includes(researcher.id)">
+                {{ researcher.fullName }}
+              </option>
+            }
+          </select>
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="action-button" [disabled]="projectForm.invalid || saving">
+            Guardar
+          </button>
+          <button type="button" class="text-button" (click)="cancelForm('project')">Cancelar</button>
+        </div>
+      </form>
+    }
   </section>
 
   <section aria-labelledby="researchers-title">
@@ -30,13 +95,51 @@
         </button>
       }
     </div>
+    @if (canManage) {
+      <button type="button" class="action-button" (click)="beginResearcherCreate()">
+        Nuevo investigador/a
+      </button>
+    }
     <div class="card-grid">
       @for (researcher of visibleResearchers; track researcher.id) {
-        <app-researcher-card [researcher]="researcher" />
+        <div class="managed-card">
+          <app-researcher-card [researcher]="researcher" />
+          @if (canManage) {
+            <div class="management-actions">
+              <button type="button" class="text-button" (click)="editResearcher(researcher)">Editar</button>
+              <button type="button" class="text-button danger-button" (click)="deleteResearcher(researcher)">
+                Eliminar
+              </button>
+            </div>
+          }
+        </div>
       } @empty {
         <p class="empty-state">No hay integrantes asociados al proyecto seleccionado.</p>
       }
     </div>
+    @if (canManage && researcherFormVisible) {
+      <form class="editor-form" #researcherForm="ngForm" (ngSubmit)="saveResearcher()">
+        <h3>{{ editingResearcherId === null ? 'Crear investigador/a' : 'Editar investigador/a' }}</h3>
+        <label>Nombre completo <input name="researcherName" [(ngModel)]="researcherDraft.fullName" required maxlength="200"></label>
+        <label>Correo electrónico
+          <input name="researcherEmail" type="email" [(ngModel)]="researcherDraft.email"
+                 [required]="editingResearcherId === null" maxlength="254">
+          @if (editingResearcherId !== null) {
+            <small>Déjalo en blanco para conservar el correo actual.</small>
+          }
+        </label>
+        <label>Institución <input name="researcherInstitution" [(ngModel)]="researcherDraft.institution" required maxlength="200"></label>
+        <label>Especialidad <input name="researcherExpertise" [(ngModel)]="researcherDraft.expertise" required maxlength="200"></label>
+        <label>Biografía <textarea name="researcherBiography" [(ngModel)]="researcherDraft.biography"></textarea></label>
+        <label>ORCID <input name="researcherOrcid" [(ngModel)]="researcherDraft.orcid" maxlength="19"></label>
+        <div class="form-actions">
+          <button type="submit" class="action-button" [disabled]="researcherForm.invalid || saving">
+            Guardar
+          </button>
+          <button type="button" class="text-button" (click)="cancelForm('researcher')">Cancelar</button>
+        </div>
+      </form>
+    }
   </section>
 
   <section aria-labelledby="publications-title">
@@ -44,15 +147,66 @@
       <h2 id="publications-title">Publicaciones científicas</h2>
       <span>{{ publications.length }} registros</span>
     </div>
+    @if (canManage) {
+      <button type="button" class="action-button" (click)="beginPublicationCreate()">
+        Nueva publicación
+      </button>
+    }
     <div class="card-grid">
       @for (publication of publications; track publication.id) {
-        <app-publication-card [publication]="publication"
-                              [highlighted]="highlightedPublicationId === publication.id"
-                              (publicationHighlighted)="highlightPublication($event)" />
+        <div class="managed-card">
+          <app-publication-card
+            [publication]="publication"
+            [highlighted]="highlightedPublicationId === publication.id"
+            (publicationHighlighted)="highlightPublication($event)" />
+          @if (canManage) {
+            <div class="management-actions">
+              <button type="button" class="text-button" (click)="editPublication(publication)">Editar</button>
+              <button type="button" class="text-button danger-button" (click)="deletePublication(publication)">
+                Eliminar
+              </button>
+            </div>
+          }
+        </div>
       } @empty {
         <p class="empty-state">Aún no hay publicaciones registradas.</p>
       }
     </div>
+    @if (canManage && publicationFormVisible) {
+      <form class="editor-form" #publicationForm="ngForm" (ngSubmit)="savePublication()">
+        <h3>{{ editingPublicationId === null ? 'Crear publicación' : 'Editar publicación' }}</h3>
+        <label>Título <input name="publicationTitle" [(ngModel)]="publicationDraft.title" required maxlength="300"></label>
+        <label>Resumen <textarea name="publicationAbstract" [(ngModel)]="publicationDraft.abstract" required></textarea></label>
+        <label>Revista o editorial <input name="publicationJournal" [(ngModel)]="publicationDraft.journal" required maxlength="240"></label>
+        <label>DOI o enlace <input name="publicationDoi" type="url" [(ngModel)]="publicationDraft.doi"></label>
+        <label>Fecha de publicación <input name="publicationDate" type="date" [(ngModel)]="publicationDraft.publicationDate" required></label>
+        <label>Proyecto relacionado
+          <select name="publicationProject" [(ngModel)]="publicationDraft.projectId">
+            <option [ngValue]="null">Sin proyecto</option>
+            @for (project of projects; track project.id) {
+              <option [ngValue]="project.id">{{ project.title }}</option>
+            }
+          </select>
+        </label>
+        <label>Autores/as
+          <select multiple required (change)="updatePublicationResearchers($event)">
+            @for (researcher of researchers; track researcher.id) {
+              <option [value]="researcher.id"
+                      [selected]="publicationDraft.researcherIds.includes(researcher.id)">
+                {{ researcher.fullName }}
+              </option>
+            }
+          </select>
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="action-button"
+                  [disabled]="publicationForm.invalid || saving || publicationDraft.researcherIds.length === 0">
+            Guardar
+          </button>
+          <button type="button" class="text-button" (click)="cancelForm('publication')">Cancelar</button>
+        </div>
+      </form>
+    }
   </section>
 
   <p class="data-note">Los registros de demostración están identificados como ejemplos. Deben sustituirse

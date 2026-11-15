@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 db.sqlite3
 *.sqlite3
+.coverage
 .DS_Store
 .env
 *.log

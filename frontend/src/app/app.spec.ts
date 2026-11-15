@@ -1,23 +1,45 @@
+import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
-describe('App', () => {
+describe('Research catalog app', () => {
+  let httpTesting: HttpTestingController;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+      providers: [
+        provideHttpClient(withXsrfConfiguration({
+          cookieName: 'csrftoken',
+          headerName: 'X-CSRFToken',
+        })),
+        provideHttpClientTesting(),
+      ],
     }).compileComponents();
+    httpTesting = TestBed.inject(HttpTestingController);
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+  afterEach(() => httpTesting.verify());
 
-  it('should render title', () => {
+  it('loads the catalog through the REST API', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, frontend');
+
+    httpTesting.expectOne('/api/research/').flush({
+      projects: [],
+      researchers: [],
+      publications: [],
+    });
+    httpTesting.expectOne('/api/research/session/').flush({
+      authenticated: false,
+      isStaff: false,
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain(
+      'Investigación científica',
+    );
+    expect(fixture.componentInstance.canManage).toBeFalse();
   });
 });
