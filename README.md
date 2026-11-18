@@ -72,7 +72,7 @@ El catálogo y la API se sirven desde el mismo origen, por lo que Angular no nec
    $env:DJANGO_ALLOWED_HOSTS = "localhost,127.0.0.1"
    ```
 
-   `.env.example` enumera las variables; Django no carga archivos `.env` automáticamente. No usar claves ni contraseñas reales en GitHub.
+   `.env.example` enumera las variables; Django no carga archivos `.env` automáticamente. No usar claves ni contraseñas reales en GitHub. En hosting también se admite `DATABASE_URL` con una URL PostgreSQL, para almacenarla como variable secreta del proveedor.
 
 3. Instalar dependencias Angular, compilar a `static/angular/` y preparar la base:
 
@@ -130,7 +130,7 @@ El workflow de GitHub Actions instala las dependencias bloqueadas de Angular con
 
 ## Producción
 
-Configurar `DJANGO_DEBUG=False`, `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS` y las variables PostgreSQL en el proveedor de despliegue. Compilar Angular y recoger estáticos antes de iniciar un servidor WSGI:
+Configurar `DJANGO_DEBUG=False`, `DJANGO_SECRET_KEY` y PostgreSQL en el proveedor de despliegue. Se puede definir la conexión mediante `DATABASE_URL` o las variables `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST` y `POSTGRES_PORT`. Django reconoce automáticamente `RENDER_EXTERNAL_HOSTNAME` para `ALLOWED_HOSTS` y `CSRF_TRUSTED_ORIGINS`; en otros proveedores, configurar esos valores explícitamente. Compilar Angular y recoger estáticos antes de iniciar un servidor WSGI:
 
 ```powershell
 npm ci --prefix frontend
@@ -141,7 +141,18 @@ python manage.py collectstatic --noinput
 gunicorn comunidad_cientifica.wsgi:application
 ```
 
-`DJANGO_SECRET_KEY` es obligatorio cuando `DJANGO_DEBUG=False`; la aplicación falla explícitamente al arrancar si falta. Configura una clave secreta fuerte en el proveedor y nunca la guardes en el repositorio. La publicación pública y la URL de evaluación aún deben configurarse en un proveedor de hosting; subir cambios a GitHub no despliega automáticamente esta aplicación Django. Después del despliegue, registrar aquí la URL pública, la URL de la API y el commit correspondiente.
+`DJANGO_SECRET_KEY` es obligatorio cuando `DJANGO_DEBUG=False`; la aplicación falla explícitamente al arrancar si falta. Configura una clave secreta fuerte en el proveedor y nunca la guardes en el repositorio. Detrás de un proxy HTTPS, Django confía en `X-Forwarded-Proto` y activa redirección/cookies seguras. La publicación pública y la URL de evaluación aún deben configurarse en un proveedor de hosting; subir cambios a GitHub no despliega automáticamente esta aplicación Django. Después del despliegue, registrar aquí la URL pública, la URL de la API y el commit correspondiente.
+
+### Despliegue en Render
+
+El repositorio incluye `render.yaml` y `build.sh` para desplegar Django, construir Angular, recoger estáticos, crear PostgreSQL y aplicar migraciones durante el predespliegue. En Render, usa **New > Blueprint**, conecta este repositorio y revisa los planes y cargos antes de seleccionar **Apply**. El Blueprint configura una base PostgreSQL persistente y una instancia web; los costos y disponibilidad dependen de los planes vigentes en la cuenta.
+
+Después de que termine el despliegue:
+
+1. En el Shell del servicio web, ejecuta `cd comunidad_cientifica && python manage.py createsuperuser` para crear las credenciales de administración. No guardes esas credenciales en GitHub ni las compartas en el informe público.
+2. Prueba `https://<servicio>.onrender.com/investigacion/`, `https://<servicio>.onrender.com/api/research/` y `https://<servicio>.onrender.com/api/research/export.xml`.
+3. Inicia sesión en `/admin/`, añade o edita un registro de prueba y vuelve a consultar el catálogo para verificar persistencia en PostgreSQL.
+4. Anota en esta documentación las URL asignadas, el commit desplegado y los resultados de la prueba desde un dispositivo externo.
 
 ## Estructura principal
 
