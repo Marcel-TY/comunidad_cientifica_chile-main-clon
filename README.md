@@ -59,34 +59,60 @@ El catálogo y la API se sirven desde el mismo origen, por lo que Angular no nec
    pip install -r requirements.txt
    ```
 
-2. Crear una base de datos y un usuario PostgreSQL para la aplicación. Luego definir las variables en la sesión PowerShell (ajustar los valores al entorno local):
+2. Crear el usuario y la base de datos PostgreSQL. Desde PowerShell, abre la consola de PostgreSQL con un usuario administrador:
+
+   ```powershell
+   psql -U postgres -h localhost -p 5432
+   ```
+
+   En el prompt `postgres=#`, ejecuta:
+
+   ```sql
+   CREATE USER comunidad_cientifica WITH LOGIN;
+   \password comunidad_cientifica
+   CREATE DATABASE comunidad_cientifica OWNER comunidad_cientifica;
+   \q
+   ```
+
+   `\password` solicita la contraseña sin incluirla en el comando. Si el usuario o base ya existen, no los crees de nuevo: revisa la configuración existente o actualiza el usuario con `ALTER USER` desde una sesión administradora.
+
+3. En la misma ventana PowerShell donde ejecutarás Django, define los parámetros locales. La contraseña se solicita de forma oculta y permanece solo en la variable de entorno de esa sesión:
 
    ```powershell
    $env:POSTGRES_DB = "comunidad_cientifica"
    $env:POSTGRES_USER = "comunidad_cientifica"
-   $env:POSTGRES_PASSWORD = "cambiar-localmente"
    $env:POSTGRES_HOST = "localhost"
    $env:POSTGRES_PORT = "5432"
-   $env:DJANGO_SECRET_KEY = "reemplazar-por-una-clave-local"
    $env:DJANGO_DEBUG = "True"
    $env:DJANGO_ALLOWED_HOSTS = "localhost,127.0.0.1"
+   Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
+   $securePassword = Read-Host "Contraseña del usuario PostgreSQL" -AsSecureString
+   $env:POSTGRES_PASSWORD = [System.Net.NetworkCredential]::new("", $securePassword).Password
    ```
 
-   `.env.example` enumera las variables; Django no carga archivos `.env` automáticamente. No usar claves ni contraseñas reales en GitHub. En hosting también se admite `DATABASE_URL` con una URL PostgreSQL, para almacenarla como variable secreta del proveedor.
+   `DATABASE_URL`, cuando está definida, tiene prioridad sobre `POSTGRES_*`; por eso se elimina en esta sesión para conectar con el PostgreSQL local. `.env.example` enumera las variables, pero Django no carga archivos `.env` automáticamente. Nunca escribas contraseñas o claves reales en el código ni las subas a GitHub.
 
-3. Instalar dependencias Angular, compilar a `static/angular/` y preparar la base:
+4. Desde la raíz del repositorio, instala dependencias Angular, compila a `static/angular/` y prepara la base:
 
    ```powershell
    npm ci --prefix frontend
    npm run build --prefix frontend
    Set-Location comunidad_cientifica
+   python manage.py check
    python manage.py migrate
    python manage.py seed_research_data
    python manage.py createsuperuser
    python manage.py runserver
    ```
 
-4. Revisar el portal en `http://127.0.0.1:8000/` y el catálogo Angular en `http://127.0.0.1:8000/investigacion/`.
+5. Revisar el portal en `http://127.0.0.1:8000/` y el catálogo Angular en `http://127.0.0.1:8000/investigacion/`.
+
+Al cerrar PowerShell, las variables de entorno de esa sesión desaparecen. También puedes limpiarlas manualmente al terminar:
+
+```powershell
+Remove-Item Env:POSTGRES_PASSWORD -ErrorAction SilentlyContinue
+Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
+```
 
 `seed_research_data` crea o actualiza registros explícitamente demostrativos para probar la persistencia y las relaciones. No son datos reales del centro: deben reemplazarse por información revisada y autorizada antes de la entrega.
 
@@ -129,6 +155,54 @@ python manage.py test accounts research
 ```
 
 El workflow de GitHub Actions instala las dependencias bloqueadas de Angular con Node.js 20.19, construye el front-end y ejecuta sus pruebas unitarias en ChromeHeadless. También instala Python 3.12/3.13, ejecuta `flake8` en la app `research` y la configuración Django, inicia PostgreSQL, aplica las migraciones (incluida la inicial de `research`) y ejecuta los tests de `accounts` y `research` con cobertura. El lint se limita a esos módulos porque el código legado de `accounts` y las vistas generales ya contienen advertencias de estilo no relacionadas con este catálogo. Los archivos generados en `static/angular/` no se versionan: se reconstruyen para cada validación o despliegue.
+
+## Sincronizar el código con GitHub
+
+El repositorio remoto del proyecto es `https://github.com/Marcel-TY/comunidad_cientifica_chile-main-clon.git`.
+
+### Descargar una copia por primera vez
+
+Si todavía no tienes el repositorio en tu equipo:
+
+```powershell
+Set-Location "$HOME\Downloads"
+git clone https://github.com/Marcel-TY/comunidad_cientifica_chile-main-clon.git
+Set-Location .\comunidad_cientifica_chile-main-clon
+```
+
+Si ya existe la carpeta local, no vuelvas a clonarla; entra en ella y comprueba el remoto:
+
+```powershell
+Set-Location "$HOME\Downloads\comunidad_cientifica_chile-main"
+git remote -v
+git status -sb
+```
+
+Si tu carpeta local tiene otro nombre o está en otra ubicación, sustituye la ruta por la carpeta raíz que contiene `.git`.
+
+Si `git remote -v` no muestra `origin`, conéctalo una sola vez:
+
+```powershell
+git remote add origin https://github.com/Marcel-TY/comunidad_cientifica_chile-main-clon.git
+git branch -M main
+```
+
+### Guardar y subir cambios posteriores
+
+Antes de preparar el commit, revisa qué archivos cambiaron. Añade solamente los archivos intencionales; evita `git add .` si hay cambios locales o archivos sin seguimiento que no quieras publicar.
+
+```powershell
+git status --short
+git diff --check
+git diff -- README.md
+git add -- README.md
+git diff --cached --check
+git diff --cached
+git commit -m "Documentar conexión PostgreSQL y GitHub"
+git push origin main
+```
+
+Para incluir otros archivos del mismo cambio, añádelos por nombre explícito a `git add --`. Si GitHub solicita autenticación, completa el inicio de sesión del navegador o configura Git Credential Manager; no pegues tokens ni contraseñas en el código, el README o la línea de comandos. No subas `.env`, contraseñas, `DATABASE_URL`, claves Django ni respaldos de bases de datos.
 
 ## Producción
 
