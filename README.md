@@ -114,6 +114,8 @@ Desde otro dispositivo en la misma red, abre `http://<IP-DEL-EQUIPO>:8000/invest
 
 Esta dirección es **solo para pruebas en la red local**: el equipo que ejecuta Django debe permanecer encendido y el servidor activo. `runserver` es un servidor de desarrollo; no lo expongas a Internet ni configures reenvío de puertos del router. Para una URL pública permanente hace falta desplegar la aplicación en un servicio de hosting.
 
+**Resultado de prueba:** se confirmó que el catálogo local carga desde otro equipo conectado a la misma red privada. Esta verificación no equivale a un despliegue público ni valida HTTPS; la IPv4 local puede cambiar según la asignación del router.
+
 ## Pruebas y compilación
 
 Desde la raíz del repositorio:
